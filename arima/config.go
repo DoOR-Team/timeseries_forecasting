@@ -11,138 +11,138 @@ type Config struct {
 	p, d, q, P, D, Q, m int
 
 	// ARMA part
-	_opAR                   *BackShift
-	_opMA                   *BackShift
-	_dp, _dq, _np, _nq      int
-	_init_seasonal          [][]float64
-	_diff_seasonal          [][]float64
-	_integrate_seasonal     [][]float64
-	_init_non_seasonal      [][]float64
-	_diff_non_seasonal      [][]float64
-	_integrate_non_seasonal [][]float64
-	lagsAR                  []int
-	paramsAR                []float64
-	lagsMA                  []int
-	paramsMA                []float64
+	opAR                 *BackShift
+	opMA                 *BackShift
+	dp, dq, np, nq       int
+	initSeasonal         [][]float64
+	diffSeasonal         [][]float64
+	integrateSeasonal    [][]float64
+	initNonSeasonal      [][]float64
+	diffNonSeasonal      [][]float64
+	integrateNonSeasonal [][]float64
+	lagsAR               []int
+	paramsAR             []float64
+	lagsMA               []int
+	paramsMA             []float64
 	// I part
-	_mean float64
+	mean float64
 }
 
 func NewConfig(p, d, q, P, D, Q, m int) Config {
 	config := Config{
-		p:                       p,
-		d:                       d,
-		q:                       q,
-		P:                       P,
-		D:                       D,
-		Q:                       Q,
-		m:                       m,
-		_opAR:                   nil,
-		_opMA:                   nil,
-		_dp:                     0,
-		_dq:                     0,
-		_np:                     0,
-		_nq:                     0,
-		_init_seasonal:          nil,
-		_diff_seasonal:          nil,
-		_integrate_seasonal:     nil,
-		_init_non_seasonal:      nil,
-		_diff_non_seasonal:      nil,
-		_integrate_non_seasonal: nil,
-		lagsAR:                  nil,
-		paramsAR:                nil,
-		lagsMA:                  nil,
-		paramsMA:                nil,
-		_mean:                   0,
+		p:                    p,
+		d:                    d,
+		q:                    q,
+		P:                    P,
+		D:                    D,
+		Q:                    Q,
+		m:                    m,
+		opAR:                 nil,
+		opMA:                 nil,
+		dp:                   0,
+		dq:                   0,
+		np:                   0,
+		nq:                   0,
+		initSeasonal:         nil,
+		diffSeasonal:         nil,
+		integrateSeasonal:    nil,
+		initNonSeasonal:      nil,
+		diffNonSeasonal:      nil,
+		integrateNonSeasonal: nil,
+		lagsAR:               nil,
+		paramsAR:             nil,
+		lagsMA:               nil,
+		paramsMA:             nil,
+		mean:                 0,
 	}
 
-	config._opAR = config.getNewOperatorAR()
-	config._opMA = config.getNewOperatorAR()
+	config.opAR = config.getNewOperatorAR()
+	config.opMA = config.getNewOperatorAR()
 
-	config._opAR.initializeParams(false)
-	config._opMA.initializeParams(false)
-	config._dp = config._opAR.getDegree()
-	config._dq = config._opMA.getDegree()
-	config._np = config._opAR.numParams()
-	config._nq = config._opMA.numParams()
+	config.opAR.initializeParams(false)
+	config.opMA.initializeParams(false)
+	config.dp = config.opAR.getDegree()
+	config.dq = config.opMA.getDegree()
+	config.np = config.opAR.numParams()
+	config.nq = config.opMA.numParams()
 	if D > 0 && m > 0 {
-		config._init_seasonal = make([][]float64, D)
-		for i, _ := range config._init_seasonal {
-			config._init_seasonal[i] = make([]float64, m)
+		config.initSeasonal = make([][]float64, D)
+		for i, _ := range config.initSeasonal {
+			config.initSeasonal[i] = make([]float64, m)
 		}
 	}
 
 	if d > 0 {
-		config._init_non_seasonal = make([][]float64, d)
-		for i, _ := range config._init_non_seasonal {
-			config._init_non_seasonal[i] = make([]float64, 1)
+		config.initNonSeasonal = make([][]float64, d)
+		for i, _ := range config.initNonSeasonal {
+			config.initNonSeasonal[i] = make([]float64, 1)
 		}
 	}
 
 	if D > 0 && m > 0 {
-		config._diff_seasonal = make([][]float64, D)
+		config.diffSeasonal = make([][]float64, D)
 	}
 
 	if d > 0 {
-		config._diff_non_seasonal = make([][]float64, d)
+		config.diffNonSeasonal = make([][]float64, d)
 	}
 
 	if D > 0 && m > 0 {
-		config._integrate_seasonal = make([][]float64, D)
+		config.integrateSeasonal = make([][]float64, D)
 	}
 
 	if d > 0 {
-		config._integrate_non_seasonal = make([][]float64, d)
+		config.integrateNonSeasonal = make([][]float64, d)
 	}
 
 	return config
 }
 
 func (c Config) getDegreeP() int {
-	return c._dp
+	return c.dp
 }
 
 func (c Config) getDegreeQ() int {
-	return c._dq
+	return c.dq
 }
 
 func (c Config) forecastOnePointARMA(data []float64, errors []float64,
 	index int) float64 {
-	estimateAR := c._opAR.getLinearCombinationFrom(data, index)
-	estimateMA := c._opMA.getLinearCombinationFrom(errors, index)
+	estimateAR := c.opAR.getLinearCombinationFrom(data, index)
+	estimateMA := c.opMA.getLinearCombinationFrom(errors, index)
 	forecastValue := estimateAR + estimateMA
 	return forecastValue
 }
 
 func (c Config) getNumParamsP() int {
-	return c._np
+	return c.np
 }
 
 func (c Config) getNumParamsQ() int {
-	return c._nq
+	return c.nq
 }
 
 func (c Config) getOffsetsAR() []int {
-	return c._opAR.paramOffsets()
+	return c.opAR.paramOffsets()
 }
 func (c Config) getOffsetsMA() []int {
-	return c._opMA.paramOffsets()
+	return c.opMA.paramOffsets()
 }
 
 func (c Config) getLastIntegrateSeasonal() []float64 {
-	return c._integrate_seasonal[c.D-1]
+	return c.integrateSeasonal[c.D-1]
 }
 
 func (c Config) getLastIntegrateNonSeasonal() []float64 {
-	return c._integrate_non_seasonal[c.d-1]
+	return c.integrateNonSeasonal[c.d-1]
 }
 
 func (c Config) getLastDifferenceSeasonal() []float64 {
-	return c._diff_seasonal[c.D-1]
+	return c.diffSeasonal[c.D-1]
 }
 
 func (c Config) getLastDifferenceNonSeasonal() []float64 {
-	return c._diff_non_seasonal[c.d-1]
+	return c.diffNonSeasonal[c.d-1]
 }
 
 func (c Config) String() string {
@@ -161,25 +161,25 @@ func (c Config) setParamsFromVector(paramVec *matrix.InsightsVector) {
 	offsetsAR := c.getOffsetsAR()
 	offsetsMA := c.getOffsetsMA()
 	for _, pIdx := range offsetsAR {
-		c._opAR.setParam(pIdx, paramVec.Get(index))
+		c.opAR.setParam(pIdx, paramVec.Get(index))
 		index++
 	}
 	for _, qIdx := range offsetsMA {
-		c._opMA.setParam(qIdx, paramVec.Get(index))
+		c.opMA.setParam(qIdx, paramVec.Get(index))
 		index++
 	}
 }
 func (c Config) getParamsIntoVector() matrix.InsightsVector {
 	index := 0
-	paramVec := matrix.NewInsightVector(c._np+c._nq, 0.0)
+	paramVec := matrix.NewInsightVector(c.np+c.nq, 0.0)
 	offsetsAR := c.getOffsetsAR()
 	offsetsMA := c.getOffsetsMA()
 	for _, pIdx := range offsetsAR {
-		paramVec.Set(index, c._opAR.getParam(pIdx))
+		paramVec.Set(index, c.opAR.getParam(pIdx))
 		index++
 	}
 	for _, qIdx := range offsetsMA {
-		paramVec.Set(index, c._opMA.getParam(qIdx))
+		paramVec.Set(index, c.opMA.getParam(qIdx))
 		index++
 	}
 	return paramVec
@@ -193,11 +193,11 @@ func (c Config) getNewOperatorMA() *BackShift {
 }
 
 func (c Config) getCurrentARCoefficients() []float64 {
-	return c._opAR.getCoefficientsFlattened()
+	return c.opAR.getCoefficientsFlattened()
 }
 
 func (c Config) getCurrentMACoefficients() []float64 {
-	return c._opMA.getCoefficientsFlattened()
+	return c.opMA.getCoefficientsFlattened()
 }
 
 func (c Config) mergeSeasonalWithNonSeasonal(nonSeasonalLag, seasonalLag, seasonalStep int) *BackShift {
@@ -217,8 +217,8 @@ func (c Config) differentiateSeasonal(data []float64) {
 	current := data
 	for j := 0; j < c.D; j++ {
 		next := make([]float64, len(current)-c.m)
-		c._diff_seasonal[j] = next
-		init := c._init_seasonal[j]
+		c.diffSeasonal[j] = next
+		init := c.initSeasonal[j]
 		utils.Differentiate(current, next, init, c.m)
 		current = next
 	}
@@ -228,30 +228,30 @@ func (c Config) differentiateNonSeasonal(data []float64) {
 	current := data
 	for j := 0; j < c.d; j++ {
 		next := make([]float64, len(current)-1)
-		c._diff_non_seasonal[j] = next
-		init := c._init_non_seasonal[j]
+		c.diffNonSeasonal[j] = next
+		init := c.initNonSeasonal[j]
 		utils.Differentiate(current, next, init, 1)
 		current = next
 	}
 }
 
-func (c Config) integrateSeasonal(data []float64) {
+func (c Config) getIntegrateSeasonal(data []float64) {
 	current := data
 	for j := 0; j < c.D; j++ {
 		next := make([]float64, len(current)+c.m)
-		c._integrate_seasonal[j] = next
-		init := c._init_seasonal[j]
+		c.integrateSeasonal[j] = next
+		init := c.initSeasonal[j]
 		utils.Integrate(current, next, init, c.m)
 		current = next
 	}
 }
 
-func (c Config) integrateNonSeasonal(data []float64) {
+func (c Config) getIntegrateNonSeasonal(data []float64) {
 	current := data
 	for j := 0; j < c.d; j++ {
 		next := make([]float64, len(current)+1)
-		c._integrate_non_seasonal[j] = next
-		init := c._init_non_seasonal[j]
+		c.integrateNonSeasonal[j] = next
+		init := c.initNonSeasonal[j]
 		utils.Integrate(current, next, init, 1)
 		current = next
 	}

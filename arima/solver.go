@@ -165,14 +165,14 @@ func integrate(params Config, dataForecastStationary []float64,
 	hasSeasonalI bool, hasNonSeasonalI bool) []float64 {
 	var forecastMerged []float64
 	if hasSeasonalI && hasNonSeasonalI {
-		params.integrateSeasonal(dataForecastStationary)
-		params.integrateNonSeasonal(params.getLastIntegrateSeasonal())
+		params.getIntegrateSeasonal(dataForecastStationary)
+		params.getIntegrateNonSeasonal(params.getLastIntegrateSeasonal())
 		forecastMerged = params.getLastIntegrateNonSeasonal()
 	} else if hasSeasonalI {
-		params.integrateSeasonal(dataForecastStationary)
+		params.getIntegrateSeasonal(dataForecastStationary)
 		forecastMerged = params.getLastIntegrateSeasonal()
 	} else if hasNonSeasonalI {
-		params.integrateNonSeasonal(dataForecastStationary)
+		params.getIntegrateNonSeasonal(dataForecastStationary)
 		forecastMerged = params.getLastIntegrateNonSeasonal()
 	} else {
 		forecastMerged = make([]float64, len(dataForecastStationary))
