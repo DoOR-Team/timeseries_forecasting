@@ -1,6 +1,5 @@
 package arima
 
-import "C"
 import (
 	"fmt"
 
